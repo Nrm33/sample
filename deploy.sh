@@ -1,17 +1,34 @@
-#!/bin/bash
-APP_DIR="/home/nikhil/deployments/sample_app"
+pipeline {
+    agent any
 
-echo "🧹 Cleaning old files..."
-rm -rf $APP_DIR/*
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Nrm33/sample.git'
+            }
+        }
 
-echo "📦 Copying new files from Jenkins workspace..."
-cp -r $WORKSPACE/* $APP_DIR/
+        stage('Build') {
+            steps {
+                echo "Building the Python app..."
+            }
+        }
 
-echo "🔁 Restarting Python app..."
-# Kill old process if running
-pkill -f "python3 app.py" || true
+        stage('Deploy') {
+            steps {
+                echo "Deploying application..."
+                sh 'chmod +x deploy.sh'
+                sh './deploy.sh'
+            }
+        }
+    }
 
-# Start app in background
-nohup python3 $APP_DIR/app.py > $APP_DIR/app.log 2>&1 &
-
-echo "✅ Deployment complete!"
+    post {
+        success {
+            echo '✅ Deployment Successful!'
+        }
+        failure {
+            echo '❌ Deployment Failed!'
+        }
+    }
+}
