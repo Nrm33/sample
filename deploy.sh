@@ -1,34 +1,13 @@
-pipeline {
-    agent any
+#!/bin/bash
+echo "🚀 Starting Deployment..."
 
-    stages {
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main', url: 'https://github.com/Nrm33/sample.git'
-            }
-        }
+# Step 1: Stop any running app
+echo "🧹 Cleaning old deployment..."
+pkill -f app.py || echo "No running app found."
 
-        stage('Build') {
-            steps {
-                echo "Building the Python app..."
-            }
-        }
+# Step 2: Start the new app
+echo "⚙️ Starting new app..."
+nohup python3 app.py > app.log 2>&1 &
 
-        stage('Deploy') {
-            steps {
-                echo "Deploying application..."
-                sh 'chmod +x deploy.sh'
-                sh './deploy.sh'
-            }
-        }
-    }
+echo "✅ Deployment successful! App restarted."
 
-    post {
-        success {
-            echo '✅ Deployment Successful!'
-        }
-        failure {
-            echo '❌ Deployment Failed!'
-        }
-    }
-}
