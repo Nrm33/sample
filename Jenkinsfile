@@ -1,28 +1,34 @@
 pipeline {
     agent any
+
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/Nrm33/sample.git'
             }
         }
+
         stage('Build') {
             steps {
-                echo 'Building the application...'
+                echo "🔧 Building the Python app..."
             }
         }
+
         stage('Deploy') {
             steps {
-                echo 'Deploying the app...'
+                echo "🚀 Deploying the app..."
+                sh 'chmod +x deploy.sh'
+                sh './deploy.sh'
             }
         }
     }
+
     post {
         success {
-            echo '✅ Build succeeded!'
+            echo '✅ Deployment completed successfully!'
         }
         failure {
-            echo '❌ Build failed.'
+            echo '❌ Deployment failed. Check logs for details.'
         }
     }
 }
